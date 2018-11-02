@@ -121,8 +121,13 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
+    <Content Include="wwwroot\css\custom.css" />
+    <Content Include="wwwroot\css\materialize.min.css" />
     <Content Include="wwwroot\js\custom.js" />
     <Content Include="wwwroot\js\jquery-3.3.1.min.js" />
+    <Content Include="wwwroot\js\materialize.min.js" />
+    <Content Include="wwwroot\pages\signup.htm" />
+    <Content Include="wwwroot\pages\home.htm" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\NinjectWebCommon.cs" />
