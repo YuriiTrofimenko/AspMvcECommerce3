@@ -5,3 +5,20 @@
     display: none;
     z-index: 1000;
 }
+
+nav a.active, ul.sidenav a.active {
+    background-color: rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+}
+
+a[href='#!home:out'] {
+    display: none;
+}
+
+section {
+    display: none;
+}
+
+    section.active {
+        display: block;
+    }
