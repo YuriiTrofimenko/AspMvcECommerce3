@@ -58,13 +58,12 @@
     //ñðàáîòàåò âïåðâûå, êîãäà â ïåðâûé ðàç óñòàíîâèòñÿ URL
     function onhashchange() {
 
-        
         var hash = location.hash || "#!home"; //  ?:
         //console.log(hash);
         var re = /#!([-0-9A-Za-z]+)(\:(.+))?/;
         var match = re.exec(hash);
-        hash = match[1];
-        var param = match[3];
+        hash = (match !== null) ? match[1] : "home";
+        var param = (match !== null) ? match[3] : undefined;
         app(hash, param); // navigate to the page
     }
 

@@ -41,7 +41,7 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
                                     mRepository.RoleEC.Find(CUSTOMER_ROLE_ID);
                                 User user = new User()
                                 {
-                                    login = _signupForm.Login
+                                    login = Uri.UnescapeDataString(_signupForm.Login)
                                     ,
                                     password = StringToMD5(_signupForm.Password)
                                     ,

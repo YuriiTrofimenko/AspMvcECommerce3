@@ -131,6 +131,11 @@
     <Content Include="wwwroot\js\jquery-3.3.1.min.js" />
     <Content Include="wwwroot\js\jquery-hashchange.js" />
     <Content Include="wwwroot\js\materialize.min.js" />
+    <Content Include="wwwroot\js\validate\additional-methods.min.js" />
+    <Content Include="wwwroot\js\validate\jquery.validate.min.js" />
+    <Content Include="wwwroot\js\validate\localization\messages_ru.min.js" />
+    <Content Include="wwwroot\js\validate\localization\messages_uk.min.js" />
+    <Content Include="wwwroot\pages\signin.htm" />
     <Content Include="wwwroot\pages\signup.htm" />
     <Content Include="wwwroot\pages\home.htm" />
   </ItemGroup>

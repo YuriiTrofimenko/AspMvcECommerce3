@@ -1,9 +1,130 @@
-﻿<h1>Sign Up</h1>
+﻿<div class="container">
+    <div class="row">
+        <div class="col s12 m12 x6 xl6">
+            <div class="card grey lighten-2">
+                <div class="card-content">
+                    <span class="card-title">Sign up</span>
+                    <div class="row">
+                        <form id="signup-form" class="col s12">
+                            <div class="row">
+                                <div class="input-field col s12">
+                                    <input id="login" name="login" type="text" class="validate">
+                                    <label for="login">Login</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s12">
+                                    <input id="password" name="password" type="text" class="validate">
+                                    <label for="password">Password</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <button class="btn waves-effect waves-light" type="submit" name="action">
+                                    Submit
+                                    <i class="material-icons right">send</i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
-    app.handler(function (param) {
+    app.handler(function () {
 
-        return function (param) {
-            //
+        return function () {
+
+            $.validator.setDefaults(
+                {
+                    ignore: [],
+                    errorClass: 'invalid',
+                    validClass: "valid",
+                    errorPlacement: function (error, element) {
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .attr('data-error', error.text());
+                    },
+                    submitHandler: function (form) {
+                        console.log('form ok');
+                    }
+                }
+            );
+
+            $('#signup-form').unbind("submit");
+            $('#signup-form').submit(function (ev) {
+
+                ev.preventDefault();
+                //Настройки валидатора для совместимости с материалайз
+                
+                $(this).validate({
+                    rules: {
+                        // simple rule, converted to {required:true}
+                        "login": "required",
+                        // compound rule
+                        "password": {
+                            required: true
+                        }
+                    },
+                    messages: {
+                        "login": "Please specify your name",
+                        "password": {
+                            "required": "We need your email address to contact you"
+                        }
+                    }
+                });
+                //console.log($(this));
+                //console.log($(this).valid());
+                if ($(this).valid()) {
+                    //var formData = $(this).serialize();
+                    //login=dsaff&password=cdsvfdbfd
+                    var formData = {
+                        "Login": encodeURIComponent($(this).find("#login").val()),
+                        "Password": encodeURIComponent($(this).find("#password").val()),
+                        "Action": "SIGN_UP"
+                    };
+                    //console.log(formData);
+                    $.ajax({
+                        url: 'api/auth'
+                        , data: JSON.stringify(formData)
+                        , type: 'POST'
+                        , contentType: 'application/json; charset=UTF-8'
+                        , dataType: 'json'
+                    }).done(function (resp) {
+
+                        if (resp !== undefined) {
+
+                            if (resp.status === 'success') {
+                                $("#signup-form")[0].reset();
+                                M.toast({ html: 'Signed up' });
+                            } else {
+
+                                $modalContainer.html('Error: ' + resp.message);
+                                modalInstance.open();
+                            }
+                        } else {
+
+                            $modalContainer.html('Error: response is empty');
+                            modalInstance.open();
+                        }
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+
+                        $modalContainer.html(jqXHR);
+                        modalInstance.open();
+                    });
+                } else {
+                    
+                    $(this).find('label').each(
+                        function (idx, el) {
+                            console.log(el);
+                            M.toast({ html: $(el).data('error') });
+                        }
+                    );
+                }
+                
+            });
             setTimeout(preloaderHide, 500);
         }
     });
