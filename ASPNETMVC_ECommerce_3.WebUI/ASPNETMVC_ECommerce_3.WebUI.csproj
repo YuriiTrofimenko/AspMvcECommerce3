@@ -135,6 +135,7 @@
     <Content Include="wwwroot\js\validate\jquery.validate.min.js" />
     <Content Include="wwwroot\js\validate\localization\messages_ru.min.js" />
     <Content Include="wwwroot\js\validate\localization\messages_uk.min.js" />
+    <Content Include="wwwroot\pages\error.htm" />
     <Content Include="wwwroot\pages\signin.htm" />
     <Content Include="wwwroot\pages\signup.htm" />
     <Content Include="wwwroot\pages\home.htm" />
@@ -151,6 +152,7 @@
     </Compile>
     <Compile Include="Models\ApiResponse.cs" />
     <Compile Include="Models\AuthForm.cs" />
+    <Compile Include="Models\NavigationData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

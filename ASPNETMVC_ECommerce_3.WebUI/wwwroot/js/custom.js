@@ -51,4 +51,22 @@ $(document).ready(function () {
     $modalContainer = $modal.find('.modal-content');
     modalInstance =
         M.Modal.getInstance($modal);
+
+    $.get("api/auth/checkauth")
+        .done(function (resp) {
+
+            if (resp !== undefined) {
+                if (resp.status === 'success' && resp.data !== null) {
+
+                    onSignIn(resp.data);
+                }
+            } else {
+                $modalContainer.html('Error: ' + resp.message);
+                modalInstance.open();
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            $modalContainer.html(jqXHR);
+            modalInstance.open();
+        });
 });

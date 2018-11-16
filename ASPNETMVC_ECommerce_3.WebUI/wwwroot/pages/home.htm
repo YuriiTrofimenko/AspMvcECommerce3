@@ -4,6 +4,37 @@
 
         return function (param) {
             //
+            if (param === 'out') {
+                var formData = {
+                    "Action": "SIGN_OUT"
+                };
+                $.ajax({
+                    url: "/api/auth"
+                    , data: JSON.stringify(formData)
+                    , type: 'POST'
+                    , contentType: 'application/json; charset=UTF-8'
+                    , dataType: 'json'
+                }).done(function (resp) {
+
+                    if (resp !== undefined) {
+
+                        if (resp.status === 'success') {
+                            onSignOut();
+                            window.location = "/#!home";
+                        } else {
+                            $modalContainer.html('Error: ' + resp.message);
+                            modalInstance.open();
+                        }
+                    } else {
+                        $modalContainer.html('Error: response is empty');
+                        modalInstance.open();
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+
+                        $modalContainer.html(jqXHR);
+                        modalInstance.open()
+                });
+            }
             setTimeout(preloaderHide, 500);
         }
     });

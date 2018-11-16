@@ -2,9 +2,11 @@
 using ASPNETMVC_ECommerce_3.WebUI.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
@@ -76,7 +78,8 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
                         try
                         {
                             User user =
-                                mRepository.UserEC.FindByLogin(_signupForm.Login);
+                                mRepository.UserEC
+                                    .FindByLogin(Uri.UnescapeDataString(_signupForm.Login));
 
                             if (user != null && StringToMD5(_signupForm.Password) == user.password)
                             {
@@ -110,19 +113,28 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
                             };
                         }
                     }
-                /*case HttpRequestParams.signout:
+                case AuthForm.ActionType.SIGN_OUT:
                     {
                         try
                         {
                             HttpContext.Current.Session["username"] = null;
-                            return new ApiResponse() { data = new List<string>() { "logout" }, error = "" };
+                            return new ApiResponse()
+                            {
+                                status = "success"
+                                ,message = "logout"
+                            };
                         }
                         catch (Exception ex)
                         {
 
-                            return new ApiResponse() { data = null, error = ex.Message };
+                            return new ApiResponse()
+                            {
+                                status = "error"
+                                ,
+                                message = ex.Message
+                            };
                         }
-                    }*/
+                    }
                 default:
                     return new ApiResponse() {
                         status = "error"
@@ -131,6 +143,71 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
             }
         }
 
+        [Route("api/auth/checkauth")]
+        public ApiResponse Get()
+        {
+            ApiResponse response = null;
+            try
+            {
+                response =
+                    new ApiResponse()
+                    {
+                        status = "success"
+                    ,
+                        message = "signed"
+                    ,
+                        data = HttpContext.Current.Session["username"]
+                    };
+            }
+            catch (Exception ex)
+            {
+
+                response =
+                    new ApiResponse()
+                    {
+                        status = "error"
+                                ,
+                        message = ex.Message
+                    };
+            }
+            return response;
+        }
+
+        [Route("api/auth/page")]
+        public Object Get([FromUri] NavigationData _navigationData)
+        {
+            if (_navigationData.pagename == "admin" || _navigationData.pagename == "adminunit")
+            {
+                if (HttpContext.Current.Session["username"] != null)
+                {
+
+                    User user =
+                        mRepository.UserEC.FindByLogin(HttpContext.Current.Session["username"].ToString());
+                    if (user.Role.name == "admin")
+                    {
+                        
+                        return GetHTMLPageText(AppDomain.CurrentDomain.BaseDirectory + "\\wwwroot\\pages\\" + _navigationData.pagename + ".htm", _navigationData.param);
+                    }
+                    else
+                    {
+                        
+                        return GetHTMLErrorPageText("Sign in as admin");
+                    }
+                }
+                else
+                {
+                    
+                    return GetHTMLErrorPageText("Sign in first");
+                }
+            }
+            else
+            {
+                
+                return GetHTMLPageText(AppDomain.CurrentDomain.BaseDirectory + "\\wwwroot\\pages\\" + _navigationData.pagename + ".htm", _navigationData.param);
+            }
+        }
+
+        //Шифрование строки
         static String StringToMD5(String _string)
         {
             byte[] hash = Encoding.UTF8.GetBytes(_string);
@@ -142,6 +219,35 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
                 result += b.ToString("x2");
             }
             return result;
+        }
+
+        //Чтение содержимого текстового файла
+        private Object GetHTMLPageText(string _pageUri, string _param)
+        {
+            var response = new HttpResponseMessage();
+            string pageText = "";
+            using (StreamReader reader = new StreamReader(_pageUri))
+            {
+                pageText = reader.ReadToEnd();
+                pageText = pageText.Replace("param", _param);
+            }
+            response.Content = new StringContent(pageText);
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+            return response;
+        }
+
+        private Object GetHTMLErrorPageText(string _messageText)
+        {
+            var response = new HttpResponseMessage();
+            string page = "";
+            using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "\\wwwroot\\pages\\error.htm"))
+            {
+                page = reader.ReadToEnd();
+                page = page.Replace("{{error-text}}", _messageText);
+            }
+            response.Content = new StringContent(page);
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+            return response;
         }
     }
 }

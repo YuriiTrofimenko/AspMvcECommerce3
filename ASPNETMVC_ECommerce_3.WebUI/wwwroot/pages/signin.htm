@@ -60,7 +60,7 @@
 
                         if (resp.status === 'success') {
                             $('#signin-form')[0].reset();
-                            onSignIn(resp.data[0]);
+                            onSignIn(resp.data);
                             window.location = "/#!home";
                         } else {
                             $modalContainer.html('Error: ' + resp.message);
@@ -70,7 +70,7 @@
                         $modalContainer.html('Error: response is empty');
                         modalInstance.open();
                     }
-                }).fail(function () {
+                }).fail(function (jqXHR, textStatus, errorThrown) {
 
                     $modalContainer.html(jqXHR);
                     modalInstance.open();
