@@ -27,7 +27,7 @@ var onSignOut = function () {
     $("a[href='#!signin']").css('display', 'block');
     $("a[href='#!signup']").css('display', 'block');
 
-    $("section#!admin").html('');
+    $("section#admin").html('');
 }
 
 var getCurrentSectionName = function () {

@@ -149,15 +149,29 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
             ApiResponse response = null;
             try
             {
-                response =
-                    new ApiResponse()
-                    {
-                        status = "success"
-                    ,
-                        message = "signed"
-                    ,
-                        data = HttpContext.Current.Session["username"]
-                    };
+                if (HttpContext.Current.Session["username"] != null)
+                {
+                    response =
+                        new ApiResponse()
+                        {
+                            status = "success"
+                            ,
+                            message = "signed"
+                            ,
+                            data = HttpContext.Current.Session["username"]
+                        };
+                }
+                else
+                {
+                    response =
+                        new ApiResponse()
+                        {
+                            status = "success"
+                            ,
+                            message = "unsigned"
+                        };
+                }
+                
             }
             catch (Exception ex)
             {
@@ -229,7 +243,10 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
             using (StreamReader reader = new StreamReader(_pageUri))
             {
                 pageText = reader.ReadToEnd();
-                pageText = pageText.Replace("param", _param);
+                if (_param != null && _param != "")
+                {
+                    pageText = pageText.Replace("param", _param);
+                }
             }
             response.Content = new StringContent(pageText);
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");

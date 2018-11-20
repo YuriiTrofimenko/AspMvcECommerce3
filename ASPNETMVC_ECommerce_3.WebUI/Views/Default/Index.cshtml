@@ -85,11 +85,13 @@
 
     <!-- Секции для представлений разделов (add admin n adminunit) -->
     @*<section id="home" class="active" data-src='@Url.Content("~/wwwroot/pages/home.htm")'></section>
-    <section id="signup" data-src='@Url.Content("~/wwwroot/pages/signup.htm")'></section>
-    <section id="signin" data-src='@Url.Content("~/wwwroot/pages/signin.htm")'></section>*@
-    <section id="home" class="active" data-src='@Url.Content("~/wwwroot/pages/home.htm")'></section>
-    <section id="signup" data-src='@Url.Content("~/wwwroot/pages/signup.htm")'></section>
-    <section id="signin" data-src='@Url.Content("~/wwwroot/pages/signin.htm")'></section>
+        <section id="signup" data-src='@Url.Content("~/wwwroot/pages/signup.htm")'></section>
+        <section id="signin" data-src='@Url.Content("~/wwwroot/pages/signin.htm")'></section>*@
+    <section id="home" class="active" data-src='@Url.Content("api/auth/page?pagename=home")'></section>
+    <section id="signup" data-src='@Url.Content("api/auth/page?pagename=signup")'></section>
+    <section id="signin" data-src='@Url.Content("api/auth/page?pagename=signin")'></section>
+    <section id="admin" data-src='@Url.Content("api/auth/page?pagename=admin")'></section>
+    <section id="adminunit" data-src='@Url.Content("api/auth/page?pagename=adminunit")'></section>
 
     <!-- Скрытое всплывающее окно -->
     <div id="modal" class="modal">
