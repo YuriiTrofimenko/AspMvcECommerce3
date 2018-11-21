@@ -253,7 +253,7 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
             return response;
         }
 
-        private Object GetHTMLErrorPageText(string _messageText)
+        public static Object GetHTMLErrorPageText(string _messageText)
         {
             var response = new HttpResponseMessage();
             string page = "";

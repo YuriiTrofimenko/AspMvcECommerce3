@@ -22,3 +22,7 @@ section {
     section.active {
         display: block;
     }
+
+.selectedTableRow {
+    color: #26a69a;
+}

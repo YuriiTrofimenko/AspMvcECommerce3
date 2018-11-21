@@ -129,3 +129,324 @@
         </div>
     </div>
 </div>
+<script>
+    app.handler(function (param) {
+
+        return function (param) {
+
+            switch (param) {
+                case "categories": {
+                    $('#categories-edit').css('display', 'block');
+                    $('#articles-edit').css('display', 'none');
+
+                    var populateCategoriesTable = function () {
+
+                        $.ajax({
+                            url: "/api/categories"
+                            , type: 'GET'
+                        }).done(function (resp) {
+
+                            if (resp.status === 'error') {
+
+                                $modalContainer.html('Error: ' + resp.message);
+                                modalInstance.open();
+                            } else {
+
+                                var template = Hogan.compile(
+                                    '<table class="table">'
+                                    + '<thead>'
+                                    + '<tr>'
+                                    + '<th>ID</th>'
+                                    + '<th>name</th>'
+                                    + '</tr>'
+                                    + '</thead>'
+                                    + '<tbody>'
+                                    + '{{#data}}'
+                                    + '<tr>'
+                                    + '<th scope="row">{{id}}</th>'
+                                    + '<td>{{name}}</td>'
+                                    + '</tr>'
+                                    + '{{/data}}'
+                                    + '{{^data}}'
+                                    + '<span>Categories list is empty</span>'
+                                    + '{{/data}}'
+                                    + '</tbody>'
+                                    + '</table>'
+                                );
+                                //Заполняем шаблон данными и помещаем на веб-страницу
+                                $('#categories-container').html(template.render(resp));
+
+                                $("#editCategory, #deleteCategory").attr('disabled', '');
+                                //Устанавливаем обработчик кликов на все строки таблицы кроме заголовка
+                                $("#categories-container tr:not(:first)").unbind("click");
+                                $("#categories-container table tr:not(:first)").click(function () {
+
+                                    //Разблокируем кнопки, когда выбрана строка таблицы
+                                    $("#editCategory, #deleteCategory").removeAttr('disabled');
+                                    //Отмечаем текст выбранной строки зеленым цветом, с остальных строк выделение убираем
+                                    //(оно могло быть ранее установлено на одну из строк)
+                                    $(this).addClass("selectedTableRow")
+                                        .siblings().removeClass("selectedTableRow");
+                                });
+                            }
+                        }).fail(function (xhr, status, message) {
+
+                            $modalContainer.html('Error: ' + message);
+                            modalInstance.open();
+                        });
+                    }
+
+                    populateCategoriesTable();
+
+                    $('#categories-edit button[type=submit]').unbind("click");
+                    $('#categories-edit button[type=submit]').click(
+
+                        function (ev) {
+
+                            ev.preventDefault();
+                            $.ajax({
+                                url: "api/categories/add"
+                                , data: { 'catname': $('#categories-edit input#name').val() }
+                                , type: 'GET'
+                            }).done(function (resp) {
+
+                                if (resp.error != "") {
+
+                                    alert("error: " + resp.error);
+                                } else {
+
+                                    populateCategoriesTable();
+                                }
+                            }).fail(function () {
+
+                                alert("error");
+                            });
+                        }
+                    );
+
+                    //
+                    $("#deleteCategory").unbind("click");
+                    $('#deleteCategory').click(function (ev) {
+
+                        ev.preventDefault();
+                        var catId = $('#categories-edit .selectedTableRow').find('th').text();
+                        $.ajax({
+                            url: "api/categories/delete"
+                            , data: { 'catid': catId }
+                            , type: 'GET'
+                        }).done(function (resp) {
+
+                            if (resp.error != "") {
+
+                                alert("error: " + resp.error);
+                            } else {
+
+                                populateCategoriesTable();
+                            }
+                        }).fail(function () {
+
+                            alert("error");
+                        });
+                    });
+
+                    break;
+                }
+                case "articles": {
+                    $('#articles-edit').css('display', 'block');
+                    $('#categories-edit').css('display', 'none');
+
+                    //Get n render articles table
+                    var populateArticlesTable = function () {
+
+                        $.ajax({
+                            url: "/api/articles/get-all"
+                            , type: 'GET'
+                        }).done(function (resp) {
+
+                            if (resp.error != "") {
+
+                                alert("error: " + resp.error);
+                            } else {
+
+                                //console.log(resp);
+                                var template = Hogan.compile(
+                                    '<table class="table">'
+                                    + '<thead>'
+                                    + '<tr>'
+                                        + '<th>ID</th>'
+                                        + '<th>title</th>'
+                                        + '<th>category</th>'
+                                        + '<th>price</th>'
+                                        + '<th>quantity</th>'
+                                    + '</tr>'
+                                    + '</thead>'
+                                    + '<tbody>'
+                                        + '{{#data}}'
+                                        + '<tr>'
+                                        + '<th scope="row">{{id}}</th>'
+                                        + '<td>{{title}}</td>'
+                                        + '<td>{{Category.name}}</td>'
+                                        + '<td>{{price}}</td>'
+                                        + '<td>{{quantity}}</td>'
+                                        + '</tr>'
+                                        + '{{/data}}'
+                                        + '{{^data}}'
+                                        + '<span>Articles list is empty</span>'
+                                        + '{{/data}}'
+                                    + '</tbody>'
+                                    + '</table>'
+                                );
+                                //Заполняем шаблон данными и помещаем на веб-страницу
+                                $('#articles-container').html(template.render(resp));
+
+                                $("#editArticle, #deleteArticle").attr('disabled', '');
+                                //Устанавливаем обработчик кликов на все строки таблицы кроме заголовка
+                                $("#articles-container tr:not(:first)").unbind("click");
+                                $("#articles-container table tr:not(:first)").click(function () {
+
+                                    //Разблокируем кнопки, когда выбрана строка таблицы
+                                    $("#editArticle, #deleteArticle").removeAttr('disabled');
+                                    //Отмечаем текст выбранной строки зеленым цветом, с остальных строк выделение убираем
+                                    //(оно могло быть ранее установлено на одну из строк)
+                                    $(this).addClass("selectedTableRow").siblings().removeClass("selectedTableRow");
+                                });
+                            }
+                        }).fail(function () {
+
+                            alert("error");
+                        });
+                    }
+
+                    populateArticlesTable();
+
+                    //Get n render all the categories (into dropdown)
+                    var populateCategoriesSelect = function () {
+
+                        $.ajax({
+                            type: 'GET',
+                            url: 'api/categories/get-all',
+                            dataType: 'json',
+                            cache: false
+                        }).done(function (responseText, textStatus, jqXHR) {
+
+                            //Готовим шаблон списка при помощи библиотеки Hogan
+                            var template = Hogan.compile(
+                                '<select>'
+                                + '<option disabled="" selected="" value="">Category</option>'
+                                + '{{#data}}'
+                                + '<option value="{{id}}">'
+                                + '{{name}}'
+                                + '</option>'
+                                + '{{/data}}'
+                                + '</select>'
+                            );
+                            //Заполняем шаблон данными и помещаем на веб-страницу
+                            $('#category-select').html(template.render(responseText));
+                            $('#category-select select').formSelect();
+
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+                            //console.log(textStatus);
+                            alert("Ошибка получения списка categories list: " + jqXHR);
+                        });
+                    }
+                    populateCategoriesSelect();
+
+                    //Prepare the image
+                    var imageBase64 = "";
+                    //console.log($('#articles-edit form input#image-input'));
+
+                    $('#articles-edit form input#image-input').unbind("change");
+                    $('#articles-edit form input#image-input').change(function (ev) {
+
+                        var file = ev.target.files[0];
+
+                        ImageTools.resize(file, {
+                            width: 300, // maximum width
+                            height: 300 // maximum height
+                        }, function (blob, didItResize) {
+                            var reader = new FileReader();
+                            reader.onloadend = function () {
+
+                                imageBase64 = reader.result;
+                                $('#articles-edit img#image').attr('src', imageBase64);
+                            }
+                            reader.readAsDataURL(blob);
+                        });
+                    });
+
+                    //New article form submit handler
+                    $('#articles-edit button[type=submit]').unbind("click");
+                    $('#articles-edit button[type=submit]').click(
+
+                        function (ev) {
+
+                            ev.preventDefault();
+
+                            var formData = $('#articles-edit form').serializeArray();
+                            //console.log(formData['title']);
+                            var selectedCategoryIndex =
+                                $('#articles-edit form #category-select li.selected').index();
+                            var selectedCategoryId =
+                                $('#articles-edit form #category-select select option')
+                                    .eq(selectedCategoryIndex)
+                                    .val();
+                            formData.push({ name: 'categoryid', value: selectedCategoryId });
+                            formData.push({ name: 'imageBase64', value: imageBase64 });
+                            //data.push({ name: 'action', value: 'create' });
+
+                            formData[0].value = encodeURIComponent(formData[0].value);
+                            formData[1].value = encodeURIComponent(formData[1].value);
+
+                            $.ajax({
+                                url: "api/articles/add"
+                                , data: formData
+                                , type: 'POST'
+                            }).done(function (resp) {
+
+                                if (resp.error != "") {
+
+                                    alert("error: " + resp.error);
+                                } else {
+                                    //console.log(resp);
+                                    populateArticlesTable();
+                                }
+                            }).fail(function () {
+
+                                alert("error");
+                            });
+                        }
+                    );
+
+                    $("#deleteArticle").unbind("click");
+                    $('#deleteArticle').click(function (ev) {
+
+                        ev.preventDefault();
+                        var artId = $('#articles-edit .selectedTableRow').find('th').text();
+                        $.ajax({
+                            url: "api/articles/delete"
+                            , data: { 'artid': artId }
+                            , type: 'GET'
+                        }).done(function (resp) {
+
+                            if (resp.error != "") {
+
+                                alert("error: " + resp.error);
+                            } else {
+
+                                populateArticlesTable();
+                            }
+                        }).fail(function () {
+
+                            alert("error");
+                        });
+                    });
+
+                    break;
+                }
+                default:
+            }
+            setTimeout(preloaderHide, 500);
+        };
+    });
+</script>

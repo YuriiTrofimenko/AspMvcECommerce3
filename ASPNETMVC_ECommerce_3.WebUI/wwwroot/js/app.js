@@ -29,16 +29,25 @@
     function app(pageName, param) {
 
         var $page = $(document.body).find("section#" + pageName);
-
+        //console.log($page);
         //var src = $page.attr("src");
         var src = $page.data("src");
+        //console.log(src);
         if (src && $page.find(">:first-child").length == 0) {
             //$.get(src, "html") // it has src and is empty - load it
             $.get(src) // it has src and is empty - load it
                 .done(function (html) {
-
+                    //console.log(src);
                     if (html) {
-                        currentPage = pageName;
+                        if (html.indexOf('error-root') === -1) {
+                            currentPage = pageName;
+                        } else {
+                            pageName = 'error'
+                            currentPage = pageName;
+                            $page =
+                                $(document.body).find("section#" + currentPage);
+                            
+                        }
                         $page.html(html);
                         show(pageName, param);
                     }

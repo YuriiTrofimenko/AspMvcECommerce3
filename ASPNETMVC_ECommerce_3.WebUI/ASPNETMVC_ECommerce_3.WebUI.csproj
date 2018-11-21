@@ -146,7 +146,9 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\ArticleController.cs" />
     <Compile Include="Controllers\AuthController.cs" />
+    <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Controllers\DemoController.cs" />
     <Compile Include="Global.asax.cs">
@@ -154,6 +156,7 @@
     </Compile>
     <Compile Include="Models\ApiResponse.cs" />
     <Compile Include="Models\AuthForm.cs" />
+    <Compile Include="Models\CategoryForm.cs" />
     <Compile Include="Models\NavigationData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
