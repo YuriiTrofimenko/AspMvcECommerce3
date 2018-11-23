@@ -176,13 +176,14 @@
                                 //Заполняем шаблон данными и помещаем на веб-страницу
                                 $('#categories-container').html(template.render(resp));
 
-                                $("#editCategory, #deleteCategory").attr('disabled', '');
+                                $("#editCategory, #deleteCategory").prop('disabled', true);
                                 //Устанавливаем обработчик кликов на все строки таблицы кроме заголовка
                                 $("#categories-container tr:not(:first)").unbind("click");
                                 $("#categories-container table tr:not(:first)").click(function () {
 
                                     //Разблокируем кнопки, когда выбрана строка таблицы
-                                    $("#editCategory, #deleteCategory").removeAttr('disabled');
+                                    //$("#editCategory, #deleteCategory").removeAttr('disabled');
+                                    $("#editCategory, #deleteCategory").prop('disabled', false);
                                     //Отмечаем текст выбранной строки зеленым цветом, с остальных строк выделение убираем
                                     //(оно могло быть ранее установлено на одну из строк)
                                     $(this).addClass("selectedTableRow")
@@ -206,20 +207,26 @@
                             ev.preventDefault();
                             $.ajax({
                                 url: "api/categories/add"
-                                , data: { 'catname': $('#categories-edit input#name').val() }
-                                , type: 'GET'
+                                , data: JSON.stringify(
+                                    { 'name': $('#categories-edit input#name').val() }
+                                )
+                                , type: 'POST'
+                                , contentType: 'application/json; charset=UTF-8'
+                                , dataType: 'json'
                             }).done(function (resp) {
 
-                                if (resp.error != "") {
+                                if (resp.status === "error") {
 
-                                    alert("error: " + resp.error);
+                                    $modalContainer.html('Error: ' + resp.message);
+                                    modalInstance.open();
                                 } else {
 
                                     populateCategoriesTable();
                                 }
-                            }).fail(function () {
+                            }).fail(function (xhr, status, message) {
 
-                                alert("error");
+                                $modalContainer.html('Error: ' + message);
+                                modalInstance.open();
                             });
                         }
                     );
@@ -231,21 +238,22 @@
                         ev.preventDefault();
                         var catId = $('#categories-edit .selectedTableRow').find('th').text();
                         $.ajax({
-                            url: "api/categories/delete"
-                            , data: { 'catid': catId }
-                            , type: 'GET'
+                            url: "api/categories/delete/" + catId
+                            , type: 'DELETE'
                         }).done(function (resp) {
 
-                            if (resp.error != "") {
+                            if (resp.status === "error") {
 
-                                alert("error: " + resp.error);
+                                $modalContainer.html('Error: ' + resp.message);
+                                modalInstance.open();
                             } else {
 
                                 populateCategoriesTable();
                             }
-                        }).fail(function () {
+                        }).fail(function (xhr, status, message) {
 
-                            alert("error");
+                            $modalContainer.html('Error: ' + message);
+                            modalInstance.open();
                         });
                     });
 
