@@ -267,13 +267,14 @@
                     var populateArticlesTable = function () {
 
                         $.ajax({
-                            url: "/api/articles/get-all"
+                            url: "/api/articles"
                             , type: 'GET'
                         }).done(function (resp) {
 
-                            if (resp.error != "") {
+                            if (resp.status === "error") {
 
-                                alert("error: " + resp.error);
+                                $modalContainer.html('Error: ' + resp.message);
+                                modalInstance.open();
                             } else {
 
                                 //console.log(resp);
@@ -319,9 +320,10 @@
                                     $(this).addClass("selectedTableRow").siblings().removeClass("selectedTableRow");
                                 });
                             }
-                        }).fail(function () {
+                        }).fail(function (xhr, status, message) {
 
-                            alert("error");
+                            $modalContainer.html('Error: ' + message);
+                            modalInstance.open();
                         });
                     }
 
@@ -331,11 +333,9 @@
                     var populateCategoriesSelect = function () {
 
                         $.ajax({
-                            type: 'GET',
-                            url: 'api/categories/get-all',
-                            dataType: 'json',
-                            cache: false
-                        }).done(function (responseText, textStatus, jqXHR) {
+                            url: 'api/categories',
+                            type: 'GET'
+                        }).done(function (resp, textStatus, jqXHR) {
 
                             //Готовим шаблон списка при помощи библиотеки Hogan
                             var template = Hogan.compile(
@@ -349,13 +349,14 @@
                                 + '</select>'
                             );
                             //Заполняем шаблон данными и помещаем на веб-страницу
-                            $('#category-select').html(template.render(responseText));
+                            $('#category-select').html(template.render(resp));
+                            //Materialize
                             $('#category-select select').formSelect();
 
-                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                        }).fail(function (xhr, status, message) {
 
-                            //console.log(textStatus);
-                            alert("Ошибка получения списка categories list: " + jqXHR);
+                            $modalContainer.html('Error: ' + message);
+                            modalInstance.open();
                         });
                     }
                     populateCategoriesSelect();
@@ -392,7 +393,7 @@
                             ev.preventDefault();
 
                             var formData = $('#articles-edit form').serializeArray();
-                            //console.log(formData['title']);
+                            
                             var selectedCategoryIndex =
                                 $('#articles-edit form #category-select li.selected').index();
                             var selectedCategoryId =
@@ -412,16 +413,17 @@
                                 , type: 'POST'
                             }).done(function (resp) {
 
-                                if (resp.error != "") {
+                                if (resp.status === "error") {
 
-                                    alert("error: " + resp.error);
+                                    $modalContainer.html('Error: ' + resp.message);
+                                    modalInstance.open();
                                 } else {
-                                    //console.log(resp);
                                     populateArticlesTable();
                                 }
-                            }).fail(function () {
+                            }).fail(function (xhr, status, message) {
 
-                                alert("error");
+                                $modalContainer.html('Error: ' + message);
+                                modalInstance.open();
                             });
                         }
                     );
@@ -430,23 +432,24 @@
                     $('#deleteArticle').click(function (ev) {
 
                         ev.preventDefault();
-                        var artId = $('#articles-edit .selectedTableRow').find('th').text();
+                        var artId =
+                            $('#articles-edit .selectedTableRow').find('th').text();
                         $.ajax({
-                            url: "api/articles/delete"
-                            , data: { 'artid': artId }
-                            , type: 'GET'
+                            url: "api/articles/delete/" + artId
+                            , type: 'DELETE'
                         }).done(function (resp) {
 
-                            if (resp.error != "") {
+                            if (resp.status === "error") {
 
                                 alert("error: " + resp.error);
                             } else {
 
                                 populateArticlesTable();
                             }
-                        }).fail(function () {
+                        }).fail(function (xhr, status, message) {
 
-                            alert("error");
+                            $modalContainer.html('Error: ' + message);
+                            modalInstance.open();
                         });
                     });
 

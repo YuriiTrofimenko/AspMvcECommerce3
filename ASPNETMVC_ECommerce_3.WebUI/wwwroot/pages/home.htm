@@ -1,4 +1,84 @@
-﻿<h1>Home</h1>
+﻿<div id="articles-grid" class="container">
+    <div class="row">
+        <div class="col s1 valign-wrapper">
+            <ul id="slide-out" class="sidenav">
+                <li>
+                    <ul class="collapsible">
+                        <li>
+                            <div class="collapsible-header">
+                                <i class="material-icons">list</i>Категории
+                            </div>
+                            <div class="collapsible-body">
+                                <form id="categories" action="#"></form>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="collapsible-header">
+                                <i class="material-icons">filter_list</i>Фильтр
+                            </div>
+                            <div class="collapsible-body">
+                                <form id="filters" action="#"></form>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="collapsible-header">
+                                <i class="material-icons">sort</i>Сортировка
+                            </div>
+                            <div class="collapsible-body">
+                                <form id="order-rules" action="#">
+                                    <p>
+                                        <label>
+                                            <input id="sortTitle" name="sort-param-group" type="radio" checked="checked" />
+                                            <span>Title</span>
+                                        </label>
+                                    </p>
+                                    <p>
+                                        <label>
+                                            <input id="sortCategory" name="sort-param-group" type="radio" />
+                                            <span>Category</span>
+                                        </label>
+                                    </p>
+                                    <p>
+                                        <label>
+                                            <input id="sortPrice" name="sort-param-group" type="radio" />
+                                            <span>Price</span>
+                                        </label>
+                                    </p>
+                                    <p>
+                                        <label>
+                                            <input id="sortQuantity" name="sort-param-group" type="radio" />
+                                            <span>Quantity</span>
+                                        </label>
+                                    </p>
+                                    <p>
+                                        <label>
+                                            <input id="sortDesc" name="sort-group" type="radio" />
+                                            <span>In descending order</span>
+                                        </label>
+                                    </p>
+                                    <p>
+                                        <label>
+                                            <input id="sortAsc" name="sort-group" type="radio" checked="checked" />
+                                            <span>In ascending order</span>
+                                        </label>
+                                    </p>
+
+                                </form>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <a href="#" data-target="slide-out" class="sidenav-trigger">
+                <i class="material-icons" style="pointer-events: none">settings</i>
+            </a>
+        </div>
+        <div id="article-grid-container" class="col s11">
+            <!-- Сюда при помощи jquery помещается шаблон grid, заполненный данными articles -->
+        </div>
+    </div>
+
+</div>
 <script>
     app.handler(function (param) {
 
@@ -35,6 +115,159 @@
                         modalInstance.open()
                 });
             }
+
+            var populateArticlesGrid = function (_filterData) {
+
+                //Добавляем на место таблицы полосу бесконечного прогресса -
+                //пока будет ожидаться ответ сервера
+                preloaderShow();
+
+                if (_filterData === undefined) {
+                    /*_filterData =
+                        { 'sort': $('form#order-rules input[type=radio]:checked').attr('id') };*/
+                    _filterData =
+                        {
+                            'sort': $('form#order-rules input[type=radio][name=sort-group]:checked').attr('id'),
+                            'sortParam': $('form#order-rules input[type=radio][name=sort-param-group]:checked').attr('id')
+                        };
+                }
+
+                $.ajax({
+                    url: 'api/articles/get-filtered',
+                    type: "POST",
+                    data: _filterData,
+                    cache: false
+                }).done(function (resp) {
+
+                    if (resp === null) {
+
+                        window.location = "/#!signin";
+                    } else if (resp !== null && resp.status === "error") {
+
+                        alert("error: " + resp.message);
+                    } else {
+
+                        var template = Hogan.compile(
+                            '<div class="col s12 m12 l6 xl4">'
+                            + '<div class="card hoverable">'
+                            + '<div class="card-image">'
+                            + '<img src="{{image_base64}}">'
+                            + '<a id="{{id}}" class="btn-floating halfway-fab waves-effect waves-light red tooltipped" data-position="top" data-tooltip="Add one item to cart"><i class="material-icons">add</i></a>'
+                            + '</div>'
+                            + '<div class="card-content">'
+                            + '<span class="card-title">'
+                            + '<div>{{title}} ({{Category.name}})</div>'
+                            + '<div>${{price}}</div>'
+                            + '</span>'
+                            + '<p>{{description}}</p>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                        );
+
+                        //resp.data
+                        //1200
+                        var colLimit = 3;
+                        if ($(document).width() <= 1200) {
+                            colLimit = 2;
+                        }
+                        $('#article-grid-container').html("");
+                        $.each(resp.data, function (index, value) {
+                            if ($('#article-grid-container > .row:last-child').length === 0
+                                || $('#article-grid-container > .row:last-child > .col').length > colLimit - 1) {
+
+                                $('#article-grid-container').append("<div class='row'></div>");
+                            }
+                            $('#article-grid-container > .row:last-child')
+                                .append(template.render(value));
+                        });
+
+                        //Заполняем шаблон данными и помещаем на веб-страницу
+                        //$('#article-grid-container').html(template.render(resp));
+
+                        $('.tooltipped').tooltip();
+                        /*$(".btn-floating").unbind("click");
+                        $('.btn-floating').click(function (ev) {
+
+                            ev.preventDefault();
+                            var artId = $(this).attr('id');
+
+                            $.ajax({
+                                url: "api/articles/cart/" + artId
+                                , data: JSON.stringify({ 'actionTypeValue': "add" })
+                                , type: 'POST'
+                                , dataType: 'json'
+                                , contentType: 'application/json; charset=UTF-8'
+                            }).done(function (resp) {
+
+                                if (resp.error !== null && resp.error !== "") {
+
+                                    alert("error: " + resp.error);
+                                } else {
+
+                                    M.toast({ html: 'One item added to the cart' });
+                                    //alert("One item added to the cart");
+                                }
+                            }).fail(function () {
+
+                                alert("error");
+                            });
+                        });*/
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+
+                    alert("Ошибка: " + jqXHR);
+                }).always(function () {
+
+                    preloaderHide();
+                });
+            }
+
+            populateArticlesGrid();
+
+            var populateCategoriesFilter = function () {
+
+                //Добавляем полосу бесконечного прогресса -
+                //пока будет ожидаться ответ сервера
+                preloaderShow();
+
+                $.ajax({
+                    url: '/api/categories/get-all',
+                    type: "GET",
+                    cache: false
+                }).done(function (resp) {
+
+                    if (resp !== undefined) {
+                        if (resp.error !== undefined && resp.error !== null) {
+                            if (resp.error !== "") {
+                                alert("error: " + resp.error);
+                            }
+                        } else {
+
+                            var template = Hogan.compile(
+                                '{{#data}}'
+                                + '<p>'
+                                + '<label for="{{id}}">'
+                                + '<input id="{{id}}" type="checkbox" /><span>{{name}}</span>'
+                                + '</label>'
+                                + '</p>'
+                                + '{{/data}}'
+                            );
+                            //Заполняем шаблон данными и помещаем на веб-страницу
+                            $('#articles-grid #categories').html(template.render(resp));
+                        }
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+
+                    alert("Ошибка: " + jqXHR);
+                }).always(function () {
+
+                    preloaderHide();
+                });
+            }
+
+            populateCategoriesFilter();
+
             setTimeout(preloaderHide, 500);
         }
     });
