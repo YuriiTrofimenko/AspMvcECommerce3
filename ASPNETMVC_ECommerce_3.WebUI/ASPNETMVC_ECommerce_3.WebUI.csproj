@@ -151,6 +151,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\ArticleController.cs" />
     <Compile Include="Controllers\AuthController.cs" />
+    <Compile Include="Controllers\CartController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Controllers\DemoController.cs" />
@@ -160,6 +161,10 @@
     <Compile Include="Models\ApiResponse.cs" />
     <Compile Include="Models\ArticleForm.cs" />
     <Compile Include="Models\AuthForm.cs" />
+    <Compile Include="Models\Cart.cs" />
+    <Compile Include="Models\CartAction.cs" />
+    <Compile Include="Models\CartItem.cs" />
+    <Compile Include="Models\CartItemDetails.cs" />
     <Compile Include="Models\CategoryForm.cs" />
     <Compile Include="Models\FilterForm.cs" />
     <Compile Include="Models\NavigationData.cs" />

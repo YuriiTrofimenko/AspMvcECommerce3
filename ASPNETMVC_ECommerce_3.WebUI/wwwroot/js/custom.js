@@ -1,6 +1,7 @@
 ﻿var $modal;
 var $modalContainer;
 var modalInstance;
+var $cart = $('.cart');
 
 var preloaderHide = function () {
     $('.preloader-wrapper').css('display', 'none');
