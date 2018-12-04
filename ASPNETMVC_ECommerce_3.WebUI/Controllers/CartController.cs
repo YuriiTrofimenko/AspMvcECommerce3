@@ -23,18 +23,31 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
         {
             try
             {
-                if (HttpContext.Current.Session["username"] != null)
+                object userNameObj =
+                    HttpContext.Current.Session["username"] ?? null;
+                if (userNameObj != null)
                 {
-                    if (HttpContext.Current.Session["cart"] == null)
+                    string userName = userNameObj as string;
+                    object cartObj = HttpContext.Current.Session["cart"];
+                    if (
+                        cartObj == null
+                            || userName != ((Cart)cartObj).UserName
+                        )
                     {
-                        HttpContext.Current.Session["cart"] =
-                            new Cart() { CartItems = new List<CartItem>() };
+                        cartObj =
+                            new Cart()
+                            {
+                                UserName = userName,
+                                CartItems = new List<CartItem>()
+                            };
+                        HttpContext.Current.Session["cart"] = cartObj;
                     }
 
                     List<CartItemDetails> cartItemDetails =
-                        (HttpContext.Current.Session["cart"] as Cart).CartItems
+                        (cartObj as Cart).CartItems
                         .Select(cartItem => {
-                            Article article = mRepository.ArticleEC.Find(cartItem.ArticleId);
+                            Article article =
+                                mRepository.ArticleEC.Find(cartItem.ArticleId);
 
                             return new CartItemDetails()
                             {
@@ -50,7 +63,11 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
                     return new ApiResponse()
                     {
                         status = "success",
-                        data = cartItemDetails
+                        data = new
+                        {
+                            CartItemDetails = cartItemDetails,
+                            UserName = userName
+                        }
                     };
                 }
                 else
@@ -77,15 +94,23 @@ namespace ASPNETMVC_ECommerce_3.WebUI.Controllers
             try
             {
                 int artidInt = Int32.Parse(artid);
-                if (HttpContext.Current.Session["username"] != null)
+                object userNameObj =
+                    HttpContext.Current.Session["username"] ?? null;
+                if (userNameObj != null)
                 {
-                    if (HttpContext.Current.Session["cart"] == null)
+                    string userName = userNameObj as string;
+                    object cartObj = HttpContext.Current.Session["cart"];
+                    if (cartObj == null
+                            || userName != ((Cart)cartObj).UserName)
                     {
-                        HttpContext.Current.Session["cart"] =
-                            new Cart() { CartItems = new List<CartItem>() };
+                        cartObj =
+                            new Cart() {
+                                UserName = userName,
+                                CartItems = new List<CartItem>()
+                            };
                     }
 
-                    Cart cart = (Cart)HttpContext.Current.Session["cart"];
+                    Cart cart = (Cart)cartObj;
                     CartItem currentCartItem =
                         cart.CartItems.Find(cartItem => cartItem.ArticleId == artidInt);
                     if (currentCartItem == null)

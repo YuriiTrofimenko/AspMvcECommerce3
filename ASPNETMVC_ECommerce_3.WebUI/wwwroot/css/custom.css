@@ -11,7 +11,7 @@ nav a.active, ul.sidenav a.active {
     font-weight: bold;
 }
 
-a[href='#!home:out'] {
+a[href='#!home:out'], .cart {
     display: none;
 }
 

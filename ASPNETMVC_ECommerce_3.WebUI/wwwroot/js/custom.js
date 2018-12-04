@@ -18,6 +18,8 @@ var onSignIn = function (login) {
 
     $("a[href='#!signin']").css('display', 'none');
     $("a[href='#!signup']").css('display', 'none');
+
+    $(".cart").css('display', 'block');
 }
 
 var onSignOut = function () {
@@ -28,7 +30,11 @@ var onSignOut = function () {
     $("a[href='#!signin']").css('display', 'block');
     $("a[href='#!signup']").css('display', 'block');
 
+    $(".cart").css('display', 'none');
+
     $("section#admin").html('');
+    $("section#adminunit").html('');
+    $modal.find('.modal-content').html('');
 }
 
 var getCurrentSectionName = function () {
@@ -37,6 +43,12 @@ var getCurrentSectionName = function () {
     var match = re.exec(hash);
     return (match !== null) ? match[1] : "home";
 }
+
+var setModalOk = function () {
+
+    var sectionName = getCurrentSectionName();
+    $modal.find('.modal-footer > a').attr('href', "#!" + sectionName);
+};
 
 //https://material.io/design/
 //https://materializecss.com

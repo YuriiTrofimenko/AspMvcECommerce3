@@ -322,7 +322,7 @@
                     if (resp !== undefined) {
                         if (resp.status !== null && resp.status === "error") {
 
-                            alert("error: " + resp.error);
+                            alert("error: " + resp.message);
                         } else {
 
                             var template = Hogan.compile(
@@ -335,7 +335,7 @@
                                 + '</tr>'
                                 + '</thead>'
                                 + '<tbody>'
-                                + '{{#data}}'
+                                + '{{#CartItemDetails}}'
                                 + '<tr>'
                                 + '<th scope="row">{{ArticleId}}</th>'
                                 + '<td>{{ArticleName}}</td>'
@@ -348,15 +348,16 @@
                                 + '</div>'
                                 + '</td>'
                                 + '</tr>'
-                                + '{{/data}}'
-                                + '{{^data}}'
+                                + '{{/CartItemDetails}}'
+                                + '{{^CartItemDetails}}'
                                 + '<span>Cart is empty</span>'
-                                + '{{/data}}'
+                                + '{{/CartItemDetails}}'
                                 + '</tbody>'
                                 + '</table>'
                             );
                             //Заполняем шаблон данными и помещаем на веб-страницу
-                            $modalContainer.html(template.render(resp));
+                            //console.log();
+                            $modalContainer.html(template.render(resp.data));
 
                             $(".plusBtn").unbind("click");
                             $('.plusBtn').click(function (ev) {
@@ -374,7 +375,7 @@
 
                                     if (resp.status !== null && resp.status === "error") {
 
-                                        alert("error: " + resp.error);
+                                        alert("error: " + resp.message);
                                     } else {
                                         //console.log("One item added to the cart");
                                         M.toast({ html: 'One item added to the cart' });
@@ -404,7 +405,7 @@
 
                                     if (resp.status !== null && resp.status === "error") {
 
-                                        alert("error: " + resp.error);
+                                        alert("error: " + resp.message);
                                     } else {
                                         M.toast({ html: 'One item removed from cart' });
                                         showCart();
@@ -421,9 +422,7 @@
                                 if (confirm("remove all the items?")) {
 
                                     ev.preventDefault();
-                                    //var artId = $(this).attr('id');
                                     var artId = $(this).parent().parent().parent().children('th').text();
-                                    //console.log(artId);
                                     $.ajax({
                                         url: "api/cart/" + artId
                                         , data: JSON.stringify({ 'actionTypeValue': "rem" })
@@ -434,7 +433,7 @@
 
                                         if (resp.status != null && resp.status === "error") {
 
-                                            alert("error: " + resp.error);
+                                            alert("error: " + resp.message);
                                         } else {
                                             M.toast({ html: 'All the items removed from cart' });
                                             showCart();
